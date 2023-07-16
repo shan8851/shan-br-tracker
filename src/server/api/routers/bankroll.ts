@@ -9,6 +9,19 @@ export const bankrollRouter = createTRPCRouter({
     return await ctx.prisma.bankroll.findMany({ where: { userId: ctx.session.user.id } });
   }),
 
+  getCurrentBankroll: protectedProcedure.query(async ({ ctx }) => {
+    const bankrollEntries = await ctx.prisma.bankroll.findMany({ where: { userId: ctx.session.user.id } });
+
+    let currentBankroll = 0;
+
+    for (const entry of bankrollEntries) {
+      currentBankroll += entry.deposit || 0;
+      currentBankroll -= entry.withdrawal || 0;
+    }
+
+    return currentBankroll;
+  }),
+
   addDeposit: protectedProcedure
     .input(z.object({ amount: z.number() }))
     .mutation(async ({ ctx, input }) => {
