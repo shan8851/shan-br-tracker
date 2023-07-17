@@ -69,7 +69,7 @@ model PokerSession {
     id        String   @id @default(cuid())
     userId    String
     date      DateTime
-    stakes    Float
+    stakes    String
     buyIn     Float
     cashOut   Float
     duration  Int

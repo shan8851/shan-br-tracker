@@ -18,7 +18,7 @@ export const sessionRouter = createTRPCRouter({
   addSession: protectedProcedure
     .input(z.object({ sessionData: z.object({
       date: z.date(),
-      stakes: z.number(),
+      stakes: z.string(),
       buyIn: z.number(),
       cashOut: z.number(),
       duration: z.number()
@@ -35,7 +35,7 @@ export const sessionRouter = createTRPCRouter({
   updateSession: protectedProcedure
     .input(z.object({ sessionId: z.string(), newSessionData: z.object({
       date: z.date().optional(),
-      stakes: z.number().optional(),
+      stakes: z.string().optional(),
       buyIn: z.number().optional(),
       cashOut: z.number().optional(),
       duration: z.number().optional()
