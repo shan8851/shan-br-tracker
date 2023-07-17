@@ -43,7 +43,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     bankroll      Bankroll[]
-    pokerSessions PokerSession[]
+    CashSessions CashSession[]
+    TournamentSessions TournamentSession[]
 }
 
 model VerificationToken {
@@ -64,7 +65,7 @@ model Bankroll {
     user       User     @relation(fields: [userId], references: [id])
 }
 
-model PokerSession {
+model CashSession {
     id        String   @id @default(cuid())
     userId    String
     date      DateTime
@@ -77,4 +78,20 @@ model PokerSession {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     user      User     @relation(fields: [userId], references: [id])
+}
+
+model TournamentSession {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime
+  tournamentName String
+  buyIn        Float
+  numEntrants  Int
+  placeFinished Int
+  cashed       Boolean
+  cashAmount   Float
+  roi          Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
 }
