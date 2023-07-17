@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
+import dayjs from "dayjs";
 
 enum Stakes {
   ONE_TWO = "£1/£2",
@@ -11,6 +12,7 @@ enum Stakes {
 }
 
 type SessionType = {
+  date: Date;
   stakes: Stakes;
   buyIn: number;
   cashOut: number;
@@ -24,6 +26,7 @@ type ErrorType = {
 };
 
 const defaultFormState: SessionType = {
+  date: new Date(),
   stakes: Stakes.ONE_TWO,
   buyIn: 0,
   cashOut: 0,
@@ -42,14 +45,26 @@ export const Sessions: React.FC = () => {
   const [errors, setErrors] = useState<ErrorType>(defaultErrorState);
   const { data: sessionData } = useSession();
 
+    const { refetch: refetchBankroll } =
+    api.bankroll.getCurrentBankroll.useQuery(undefined, {
+      enabled: sessionData?.user !== undefined,
+    });
+
   const { data: sessions, refetch: refetchSessions } =
     api.session.getAllSessions.useQuery(undefined, {
       enabled: sessionData?.user !== undefined,
     });
 
+    const updateBankroll = api.bankroll.addDeposit.useMutation({
+      onSuccess: () => {
+        void refetchBankroll();
+      }
+    })
+
   const addSession = api.session.addSession.useMutation({
-    onSuccess: () => {
+    onSuccess: (newSession) => {
       setFormState(defaultFormState);
+      updateBankroll.mutate({ amount: newSession.profit});
       void refetchSessions();
     },
   });
@@ -66,11 +81,12 @@ export const Sessions: React.FC = () => {
     }
     addSession.mutate({
       sessionData: {
-        date: new Date(),
         ...formState,
       },
     });
   };
+
+  const sessionsAvailable = sessions && sessions?.length > 0;
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-8">
@@ -88,6 +104,23 @@ export const Sessions: React.FC = () => {
         <div className="drawer-side">
           <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
           <div className="menu h-full w-80 bg-base-200 p-4 text-base-content">
+          <div className="form-control w-full max-w-xs">
+                  <label className="label">
+                <span className="label-text">Stakes</span>
+              </label>
+              <input
+                value={formState.date.toISOString().substring(0, 10)}
+                type="date"
+                className="input input-bordered w-full max-w-xs"
+                onChange={(e) => {
+                  // Update form state
+                  setFormState((prevState) => ({
+                    ...prevState,
+                    date: new Date(e.target.value),
+                  }));
+                }}
+                 />
+          </div>
             <div className="form-control w-full max-w-xs">
               <label className="label">
                 <span className="label-text">Stakes</span>
@@ -122,7 +155,7 @@ export const Sessions: React.FC = () => {
                   // Update form state
                   setFormState((prevState) => ({
                     ...prevState,
-                    buyIn: parseInt(e.target.value),
+                    buyIn: parseFloat(e.target.value),
                   }));
 
                   // If there was an error, reset the error state for the buyIn field
@@ -151,7 +184,7 @@ export const Sessions: React.FC = () => {
                   // Update form state
                   setFormState((prevState) => ({
                     ...prevState,
-                    cashOut: parseInt(e.target.value),
+                    cashOut: parseFloat(e.target.value),
                   }));
 
                   // If there was an error, reset the error state for the cashOut field
@@ -182,7 +215,7 @@ export const Sessions: React.FC = () => {
                   // Update form state
                   setFormState((prevState) => ({
                     ...prevState,
-                    duration: parseInt(e.target.value),
+                    duration: parseFloat(e.target.value),
                   }));
 
                   // If there was an error, reset the error state for the duration field
@@ -210,11 +243,37 @@ export const Sessions: React.FC = () => {
           </div>
         </div>
       </div>
-      <div>
-        {sessions?.map((session) => (
-          <div key={session.id}>{JSON.stringify(session)}</div>
-        ))}
-      </div>
+      {sessionsAvailable && (
+        <div className="overflow-x-auto">
+          <table className="table">
+            {/* head */}
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Stakes</th>
+                <th>Buy In</th>
+                <th>Cash Out</th>
+                <th>P/L</th>
+                <th>Duration</th>
+                <th>Hourly</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions?.map((session) => (
+                <tr key={session.id} className="hover">
+                  <td>{dayjs(session.date).format("DD/MM/YYYY")}</td>
+                  <td>{session.stakes}</td>
+                  <td>{`£${session.buyIn}`}</td>
+                  <td>{`£${session.cashOut}`}</td>
+                  <td>{`£${session.profit}`}</td>
+                  <td>{`${session.duration} hours`}</td>
+                  <td>{`£${session.hourly} p/h`}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

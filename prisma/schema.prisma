@@ -35,9 +35,9 @@ model Session {
 }
 
 model User {
-    id            String       @id @default(cuid())
+    id            String         @id @default(cuid())
     name          String?
-    email         String?      @unique
+    email         String?        @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
@@ -45,7 +45,6 @@ model User {
     bankroll      Bankroll[]
     pokerSessions PokerSession[]
 }
-
 
 model VerificationToken {
     identifier String
@@ -56,13 +55,13 @@ model VerificationToken {
 }
 
 model Bankroll {
-    id        String   @id @default(cuid())
-    userId    String
-    deposit   Float?   @default(0)
-    withdrawal Float?  @default(0)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    user      User     @relation(fields: [userId], references: [id])
+    id         String   @id @default(cuid())
+    userId     String
+    deposit    Float?   @default(0)
+    withdrawal Float?   @default(0)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    user       User     @relation(fields: [userId], references: [id])
 }
 
 model PokerSession {
@@ -72,7 +71,9 @@ model PokerSession {
     stakes    String
     buyIn     Float
     cashOut   Float
-    duration  Int
+    duration  Float
+    profit    Float
+    hourly    Float
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     user      User     @relation(fields: [userId], references: [id])
