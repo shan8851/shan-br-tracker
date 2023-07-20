@@ -21,7 +21,6 @@ export default function Home() {
         <>
           {isLoggedIn && (
             <>
-              <Header />
               <Bankroll />
               <Cash />
               <Tournaments />
