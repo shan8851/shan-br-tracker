@@ -2,6 +2,7 @@ import { useSession } from "next-auth/react";
 import React from "react";
 import { api } from "~/utils/api";
 import dayjs from "dayjs";
+import { AddCashForm } from "./addCashForm";
 
 export const Cash: React.FC = () => {
   const { data: sessionData } = useSession();
@@ -25,9 +26,9 @@ export const Cash: React.FC = () => {
   const fallbackLastSessionDate = currentDate;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-8 max-w-3xl mx-auto">
+    <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 py-8">
       <h1 className="text-3xl font-extrabold">Cash Games</h1>
-      <div className="stats  bg-primary stats-vertical shadow lg:stats-horizontal w-full">
+      <div className="stats  stats-vertical w-full bg-primary shadow lg:stats-horizontal">
         <div className="stat">
           <div className="stat-title">Sessions</div>
           <div className="stat-value">{sessions?.totalSessions ?? 0}</div>
@@ -46,7 +47,7 @@ export const Cash: React.FC = () => {
           <div className="stat-title">Winning Sessions</div>
           <div className="stat-value">{sessions?.winningSessions ?? 0}</div>
           <div className="stat-desc">
-            {sessions?.winningSessionPercent ?? "0%"}
+            {`${sessions?.winningSessionPercent ?? 0}%`}
           </div>
         </div>
 
@@ -54,22 +55,33 @@ export const Cash: React.FC = () => {
           <div className="stat-title">Losing Sessions</div>
           <div className="stat-value">{sessions?.losingSessions ?? 0}</div>
           <div className="stat-desc">
-            {sessions?.losingSessionPercent ?? "0%"}
+            {`${sessions?.losingSessionPercent ?? 0}%`}
           </div>
         </div>
       </div>
-      <div className="stats stats-vertical shadow lg:stats-horizontal w-full">
+      <div className="stats stats-vertical w-full shadow lg:stats-horizontal">
         <div className="stat">
           <div className="stat-title">Hourly</div>
-          <div className="stat-value">{(sessions?.totalSessions ?? 0).toLocaleString("en-GB", { style: "currency", currency: 'GBP'})}</div>
+          <div className="stat-value">
+            {(sessions?.totalHourly ?? 0).toLocaleString("en-GB", {
+              style: "currency",
+              currency: "GBP",
+            })}
+          </div>
         </div>
 
         <div className="stat">
           <div className="stat-title">Profit/Loss</div>
           <div className="stat-value">
             <div className="flex items-center gap-2">
-              <p>{(sessions?.totalProfit ?? 0).toLocaleString("en-GB", { style: "currency", currency: 'GBP'})}</p>
-              <p>{profitSymbol}</p>
+            <p>{profitSymbol}</p>
+              <p>
+                {(sessions?.totalProfit ?? 0).toLocaleString("en-GB", {
+                  style: "currency",
+                  currency: "GBP",
+                })}
+              </p>
+
             </div>
           </div>
         </div>
@@ -79,6 +91,18 @@ export const Cash: React.FC = () => {
           <div className="stat-value">{sessions?.totalHours ?? 0}</div>
         </div>
       </div>
+        <div className="drawer drawer-end">
+          <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-content flex items-center justify-center">
+            <label
+              htmlFor="my-drawer-4"
+              className="btn btn-neutral btn-block drawer-button"
+            >
+              Add new session
+            </label>
+          </div>
+          <AddCashForm />
+        </div>
     </div>
   );
 };

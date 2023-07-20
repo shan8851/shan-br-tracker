@@ -2,7 +2,11 @@ import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 
-export const Withdrawal: React.FC = () => {
+interface Props {
+  onClose: () => void;
+}
+
+export const Withdrawal: React.FC<Props> = ({ onClose }) => {
   const [withdrawal, setWithdrawal] = useState<number>(0);
 
   const { data: sessionData } = useSession();
@@ -18,6 +22,7 @@ export const Withdrawal: React.FC = () => {
     onSuccess: () => {
       setWithdrawal(0);
       void refetchBankroll();
+      onClose()
     },
   });
 
@@ -37,6 +42,24 @@ export const Withdrawal: React.FC = () => {
         >
           WITHDRAW
         </button>
+              <button
+        onClick={onClose}
+        className="btn btn-square">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
       </div>
   );
 };

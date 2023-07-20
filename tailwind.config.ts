@@ -7,6 +7,6 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", "winter", "cyberpunk"],
+    themes: ["light", "dark", "winter", "cyberpunk", "synthwave", "halloween", "forest", "dracula", "retro", "valentine", "bumblebee", "emerald", "corporate", "christmas", "business", "cmyk"],
   },
 } satisfies Config;

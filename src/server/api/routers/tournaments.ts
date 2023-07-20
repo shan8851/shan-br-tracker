@@ -87,16 +87,16 @@ export const tournamentRouter = createTRPCRouter({
     const profitLoss = totalCashes - totalBuyIns;
 
     return {
-      totalTournaments,
-      totalBuyIns,
-      totalCashes,
-      roi,
-      itmPercentage,
-      finalTables,
-      top3,
-      wins,
-      averageBuyIn,
-      profitLoss,
+      totalTournaments: totalTournaments || 0,
+      totalBuyIns: totalBuyIns || 0,
+      totalCashes: totalCashes || 0,
+      roi: roi || 0,
+      itmPercentage: itmPercentage || 0,
+      finalTables: finalTables || 0,
+      top3: top3 || 0,
+      wins: wins || 0,
+      averageBuyIn: averageBuyIn || 0,
+      profitLoss: profitLoss || 0,
     };
   }),
 });
