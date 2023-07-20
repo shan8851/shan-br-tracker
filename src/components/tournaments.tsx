@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import React from "react";
 import { api } from "~/utils/api";
+import { AddTournamentForm } from "./addTournamentForm";
 
 export const Tournaments: React.FC = () => {
   const { data: sessionData } = useSession();
@@ -57,10 +58,25 @@ export const Tournaments: React.FC = () => {
 
         <div className="stat">
           <div className="stat-title">Return On Investment</div>
-          <div className="stat-value">{tournaments?.roi ?? "0%"}</div>
+          <div className="stat-value">{`${tournaments?.roi ?? 0}%`}</div>
         </div>
       </div>
-      <button className="btn btn-neutral btn-block">Add Tournament</button>
+      <div className="drawer drawer-end">
+        <input
+          id="add_tournament_session"
+          type="checkbox"
+          className="drawer-toggle"
+        />
+        <div className="drawer-content flex items-center justify-center">
+          <label
+            htmlFor="add_tournament_session"
+            className="btn btn-neutral drawer-button btn-block"
+          >
+            Add tournament
+          </label>
+        </div>
+        <AddTournamentForm />
+      </div>
     </div>
   );
 };

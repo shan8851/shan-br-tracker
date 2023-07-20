@@ -2,45 +2,39 @@ import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 
-enum Stakes {
-  ONE_TWO = "£1/£2",
-  ONE_THREE = "£1/£3",
-  TWO_FIVE = "£2/£5",
-  FIVE_TEN = "£5/£10",
-  TEN_TWENTY_FIVE = "£10/£25",
-}
-
-type SessionType = {
+type TournamentType = {
   date: Date;
-  stakes: Stakes;
   buyIn: number;
-  cashOut: number;
-  duration: number;
+  numEntrants: number;
+  placeFinished: number;
+  cashed: boolean;
+  cashAmount: number;
 };
 
 type ErrorType = {
   buyIn: boolean;
-  cashOut: boolean;
-  duration: boolean;
+  numEntrants: boolean;
+  placeFinished: boolean;
 };
 
-const defaultFormState: SessionType = {
+const defaultFormState: TournamentType = {
   date: new Date(),
-  stakes: Stakes.ONE_TWO,
   buyIn: 0,
-  cashOut: 0,
-  duration: 0,
+  numEntrants: 0,
+  placeFinished: 0,
+  cashed: false,
+  cashAmount: 0,
 };
 
 const defaultErrorState: ErrorType = {
   buyIn: false,
-  cashOut: false,
-  duration: false,
+  numEntrants: false,
+  placeFinished: false,
 };
 
-export const AddCashForm: React.FC = () => {
+export const AddTournamentForm: React.FC = () => {
   const [formState, setFormState] =
-    React.useState<SessionType>(defaultFormState);
+    React.useState<TournamentType>(defaultFormState);
   const [errors, setErrors] = useState<ErrorType>(defaultErrorState);
   const { data: sessionData } = useSession();
 
@@ -57,17 +51,15 @@ export const AddCashForm: React.FC = () => {
     },
   });
 
-  const { refetch: refetchTotals } = api.session.getTotals.useQuery(
-    undefined,
-    {
+  const { refetch: refetchTotals } =
+    api.tournament.getTotals.useQuery(undefined, {
       enabled: sessionData?.user !== undefined,
-    }
-  );
+    });
 
-  const addSession = api.session.addSession.useMutation({
-    onSuccess: (newSession) => {
+  const addTournament = api.tournament.addTournament.useMutation({
+    onSuccess: (newTournament) => {
       setFormState(defaultFormState);
-      updateBankroll.mutate({ amount: newSession.profit });
+      updateBankroll.mutate({ amount: newTournament.profit });
       void refetchTotals();
     },
   });
@@ -75,20 +67,20 @@ export const AddCashForm: React.FC = () => {
   const onSubmit = () => {
     const newErrors = {
       buyIn: formState.buyIn <= 0,
-      cashOut: formState.cashOut <= 0,
-      duration: formState.duration <= 0,
+      numEntrants: formState.numEntrants <= 0,
+      placeFinished: formState.placeFinished <= 0,
     };
     setErrors((prevState) => ({ ...prevState, ...newErrors }));
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
-    addSession.mutate({
-      sessionData: {
+    addTournament.mutate({
+      tournamentData: {
         ...formState,
       },
     });
     const drawerToggle = document.getElementById(
-      "add_cash_session"
+      "add_tournament_session"
     ) as HTMLInputElement;
 
     if (drawerToggle) {
@@ -98,11 +90,14 @@ export const AddCashForm: React.FC = () => {
 
   return (
     <div className="drawer-side">
-      <label htmlFor="add_cash_session" className="drawer-overlay"></label>
+      <label
+        htmlFor="add_tournament_session"
+        className="drawer-overlay"
+      ></label>
       <div className="menu h-full w-80 bg-base-200 p-4 text-base-content">
         <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">Stakes</span>
+            <span className="label-text">Date</span>
           </label>
           <input
             value={formState.date.toISOString().substring(0, 10)}
@@ -118,38 +113,17 @@ export const AddCashForm: React.FC = () => {
         </div>
         <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">Date</span>
-          </label>
-          <select
-            value={formState.stakes}
-            onChange={(e) =>
-              setFormState((prevState) => ({
-                ...prevState,
-                stakes: e.target.value as Stakes,
-              }))
-            }
-            className="select select-bordered"
-          >
-            <option value="£1/£2">1/2</option>
-            <option value="£1/£3">1/3</option>
-            <option value="£2/£5">2/5</option>
-            <option value="£5/£10">5/10</option>
-            <option value="£10/£25">10/25</option>
-          </select>
-        </div>
-        <div className="form-control w-full max-w-xs">
-          <label className="label">
             <span className="label-text">Buy in</span>
           </label>
           <input
             value={formState.buyIn}
             type="number"
-            placeholder="500"
+            placeholder="including rake eg: 150"
             className="input input-bordered w-full max-w-xs"
             onChange={(e) => {
               setFormState((prevState) => ({
                 ...prevState,
-                buyIn: parseFloat(e.target.value),
+                buyIn: parseInt(e.target.value),
               }));
               if (errors.buyIn) {
                 setErrors((prevState) => ({
@@ -160,67 +134,97 @@ export const AddCashForm: React.FC = () => {
             }}
           />
         </div>
+        <div className="form-control w-full max-w-xs">
+          <label className="label">
+            <span className="label-text">No. of entrants</span>
+          </label>
+          <input
+            value={formState.numEntrants}
+            type="number"
+            placeholder="500"
+            className="input input-bordered w-full max-w-xs"
+            onChange={(e) => {
+              setFormState((prevState) => ({
+                ...prevState,
+                numEntrants: parseInt(e.target.value),
+              }));
+              if (errors.buyIn) {
+                setErrors((prevState) => ({
+                  ...prevState,
+                  numEntrants: false,
+                }));
+              }
+            }}
+          />
+        </div>
         {errors.buyIn && (
           <div className="text-red-500">Buy in must be greater than 0</div>
         )}
         <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">Cash out</span>
+            <span className="label-text">Finished</span>
           </label>
           <input
-            value={formState.cashOut}
+            value={formState.placeFinished}
             type="number"
-            placeholder="1500"
+            placeholder="3"
             className="input input-bordered w-full max-w-xs"
             onChange={(e) => {
               setFormState((prevState) => ({
                 ...prevState,
-                cashOut: parseFloat(e.target.value),
+                placeFinished: parseFloat(e.target.value),
               }));
-              if (errors.cashOut) {
+              if (errors.placeFinished) {
                 setErrors((prevState) => ({
                   ...prevState,
-                  cashOut: false,
+                  placeFinished: false,
                 }));
               }
             }}
           />
         </div>
-        {errors.cashOut && (
+        {errors.placeFinished && (
           <div className="text-red-500">Cash out must be greater than 0</div>
         )}
         <div className="form-control w-full max-w-xs">
+          <label className="label cursor-pointer">
+            <span className="label-text">Cashed?</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-accent"
+              checked={formState.cashed}
+              onChange={(e) => {
+                setFormState((prevState) => ({
+                  ...prevState,
+                  cashed: e.target.checked,
+                }));
+              }}
+            />
+          </label>
+        </div>
+        <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">Duration (hours)</span>
+            <span className="label-text">Cash Amount</span>
           </label>
           <input
-            value={formState.duration}
+            value={formState.cashAmount}
             type="number"
-            placeholder="2.5"
+            placeholder="1300"
             className="input input-bordered w-full max-w-xs"
             onChange={(e) => {
               setFormState((prevState) => ({
                 ...prevState,
-                duration: parseFloat(e.target.value),
+                cashAmount: parseFloat(e.target.value),
               }));
-              if (errors.duration) {
-                setErrors((prevState) => ({
-                  ...prevState,
-                  duration: false,
-                }));
-              }
             }}
           />
         </div>
-        {errors.duration && (
-          <div className="text-red-500">Duration must be greater than 0</div>
-        )}
         <button
           disabled={Object.values(errors).some((error) => error)}
           onClick={onSubmit}
           className="btn btn-primary mt-4"
         >
-          Add Session
+          Add Tournament
         </button>
       </div>
     </div>

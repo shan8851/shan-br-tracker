@@ -47,7 +47,7 @@ export const Cash: React.FC = () => {
           <div className="stat-title">Winning Sessions</div>
           <div className="stat-value">{sessions?.winningSessions ?? 0}</div>
           <div className="stat-desc">
-            {`${sessions?.winningSessionPercent ?? 0}%`}
+            {`${(sessions?.winningSessionPercent ?? 0).toFixed(2)}%`}
           </div>
         </div>
 
@@ -55,7 +55,7 @@ export const Cash: React.FC = () => {
           <div className="stat-title">Losing Sessions</div>
           <div className="stat-value">{sessions?.losingSessions ?? 0}</div>
           <div className="stat-desc">
-            {`${sessions?.losingSessionPercent ?? 0}%`}
+            {`${(sessions?.losingSessionPercent ?? 0).toFixed(2)}%`}
           </div>
         </div>
       </div>
@@ -74,14 +74,13 @@ export const Cash: React.FC = () => {
           <div className="stat-title">Profit/Loss</div>
           <div className="stat-value">
             <div className="flex items-center gap-2">
-            <p>{profitSymbol}</p>
+              <p>{profitSymbol}</p>
               <p>
                 {(sessions?.totalProfit ?? 0).toLocaleString("en-GB", {
                   style: "currency",
                   currency: "GBP",
                 })}
               </p>
-
             </div>
           </div>
         </div>
@@ -91,18 +90,22 @@ export const Cash: React.FC = () => {
           <div className="stat-value">{sessions?.totalHours ?? 0}</div>
         </div>
       </div>
-        <div className="drawer drawer-end">
-          <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content flex items-center justify-center">
-            <label
-              htmlFor="my-drawer-4"
-              className="btn btn-neutral btn-block drawer-button"
-            >
-              Add new session
-            </label>
-          </div>
-          <AddCashForm />
+      <div className="drawer drawer-end">
+        <input
+          id="add_cash_session"
+          type="checkbox"
+          className="drawer-toggle"
+        />
+        <div className="drawer-content flex items-center justify-center">
+          <label
+            htmlFor="add_cash_session"
+            className="btn btn-neutral drawer-button btn-block"
+          >
+            Add new session
+          </label>
         </div>
+        <AddCashForm />
+      </div>
     </div>
   );
 };
