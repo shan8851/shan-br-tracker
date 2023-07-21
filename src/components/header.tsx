@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import ThemeSelector from "./themeSelector";
 
 export const Header = () => {
   const { data: sessionData } = useSession();
@@ -31,6 +32,8 @@ export const Header = () => {
               </button>
           )}
         </div>
+                 <ThemeSelector />
+
       </div>
     </div>
   )
