@@ -3,6 +3,7 @@ import React from "react";
 import { api } from "~/utils/api";
 import { Deposit } from "./deposit";
 import { Withdrawal } from "./withdrawal";
+import { BankrollOverTime } from "./bankrollOverTime";
 
 export const Bankroll: React.FC = () => {
   const [showDeposit, setShowDeposit] = React.useState<boolean>(false);
@@ -46,6 +47,7 @@ export const Bankroll: React.FC = () => {
       {showWithdraw && (
         <Withdrawal onClose={() => setShowWithdraw(false)} />
       )}
+      <BankrollOverTime />
     </div>
   );
 };

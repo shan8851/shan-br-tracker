@@ -1,5 +1,4 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import ThemeSelector from "./themeSelector";
 import Link from "next/link";
 
 export const Header = () => {
@@ -39,7 +38,6 @@ export const Header = () => {
             </button>
           )}
         </div>
-        <ThemeSelector />
       </div>
     </div>
   );
