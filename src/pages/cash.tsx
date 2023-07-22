@@ -1,20 +1,12 @@
 import React from "react";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
-import { api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 import { useTable } from 'react-table';
 import type { Column } from 'react-table';
 import Link from "next/link";
 
-type Session = {
-  id: string;
-  date: Date;
-  stakes: string;
-  buyIn: number;
-  cashOut: number;
-  duration: number;
-  // add other fields as necessary
-};
+type Session = RouterOutputs["session"]["getAllSessions"][0];
 
 const Cash: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -42,6 +34,11 @@ const Cash: NextPage = () => {
       {
         Header: "Cash Out",
         accessor: "cashOut",
+      },
+            {
+        Header: "Hourly",
+        accessor: "hourly",
+        Cell: ({ value }: { value: number }) => `£${value.toFixed(2)}`,
       },
       {
         Header: "Duration",

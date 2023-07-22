@@ -1,21 +1,13 @@
 import React from "react";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
-import { api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 import { useTable } from 'react-table';
 import type { Column } from 'react-table';
 import Link from "next/link";
 import { calculateROI } from "~/helpers/getRoi";
 
-type Tourney = {
-  id: string;
-  date: Date;
-  buyIn: number;
-  numEntrants: number;
-  placeFinished: number;
-  cashAmount: number;
-  roi: number;
-};
+type Tourney = RouterOutputs["tournament"]["getAllTournaments"][0];
 
 const Tournaments: NextPage = () => {
   const { data: sessionData } = useSession();
