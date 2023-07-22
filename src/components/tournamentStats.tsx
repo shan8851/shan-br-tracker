@@ -2,8 +2,9 @@ import { useSession } from "next-auth/react";
 import React from "react";
 import { api } from "~/utils/api";
 import { AddTournamentForm } from "./addTournamentForm";
+import Link from "next/link";
 
-export const Tournaments: React.FC = () => {
+export const TournamentStats: React.FC = () => {
   const { data: sessionData } = useSession();
 
   const { data: tournaments } = api.tournament.getTotals.useQuery(undefined, {
@@ -77,6 +78,7 @@ export const Tournaments: React.FC = () => {
         </div>
         <AddTournamentForm />
       </div>
+      <Link href="/tournaments" className="btn btn-secondary btn-block">View all tournaments</Link>
     </div>
   );
 };

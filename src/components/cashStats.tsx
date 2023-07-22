@@ -3,8 +3,9 @@ import React from "react";
 import { api } from "~/utils/api";
 import dayjs from "dayjs";
 import { AddCashForm } from "./addCashForm";
+import Link from "next/link";
 
-export const Cash: React.FC = () => {
+export const CashStats: React.FC = () => {
   const { data: sessionData } = useSession();
 
   const { data: sessions } = api.session.getTotals.useQuery(undefined, {
@@ -106,6 +107,7 @@ export const Cash: React.FC = () => {
         </div>
         <AddCashForm />
       </div>
+      <Link href="/cash" className="btn btn-secondary btn-block">View all sessions</Link>
     </div>
   );
 };
